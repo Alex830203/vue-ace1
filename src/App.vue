@@ -35,11 +35,11 @@
             class="router"
             >API</router-link
           >
-          <!-- <router-link
+          <router-link
             :to="{ path: '/tgbot', query: { token: isLoggedIn ? userToken : null } }"
             class="router"
-            >TG BOT</router-link
-          > -->
+            >口袋名單</router-link
+          >
         </div>
       </div>
 
@@ -65,8 +65,8 @@ import axios from "axios";
 export default {
   data() {
     return {
-      userCode: "", // 使用者帳號綁定的資料屬性
-      userPwd: "", // 使用者密碼綁定的資料屬性
+      userCode: "admin", // 使用者帳號綁定的資料屬性
+      userPwd: "111111", // 使用者密碼綁定的資料屬性
       isLoggedIn: false, //預設登入狀態
       userToken: "",
       currentTime: this.getCurrentTime(),
@@ -92,7 +92,7 @@ export default {
     async login() {
       try {
         const response = await axios.post(
-          "https://nc-ugs-bo.ms16618.com/mgtapipb.MgtApiService/AuthLogin",
+          "https://my-json-server.typicode.com/Alex830203/Data/posts",
           {
             userCode: this.userCode,
             userPwd: this.userPwd,
