@@ -1,15 +1,292 @@
-<!-- eslint-disable vue/valid-template-root -->
 <template>
-  <!-- your template code here -->
+  <div class="eating-history">
+    <h2>{{ currentYear }} 年 {{ currentMonth + 1 }} 月</h2>
+    <button @click="prevMonth">上個月</button>
+    <button @click="nextMonth">下個月</button>
+
+    <div class="calendar">
+      <div
+        class="day"
+        v-for="(day, index) in daysInMonth"
+        :key="index"
+        @click="showEntryModal(day.date)"
+      >
+        <div class="date">
+          {{ day.date ? day.date.getDate() + ' (' + getDayOfWeek(day.date) + ')' : '' }}
+        </div>
+        <div class="entries">
+          <div v-for="(entry, entryIndex) in day.entries" :key="entryIndex" class="entry">
+            <div>{{ entry.name }}</div>
+            <button
+              class="delete-button"
+              @click.stop="deleteEntry(day.date, entryIndex)"
+              v-show="isHovered[index][entryIndex]"
+            >
+              X
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="modalDate !== null" class="modal">
+      <h3>{{ modalDate.toLocaleDateString() }}</h3>
+      <input v-model="newEntryModal" placeholder="新增店家名稱" />
+      <button @click="addEntryModal">新增</button>
+      <button @click="closeModal">取消</button>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
-  name: "AboutPage",
-  // your component logic here
+  data() {
+    return {
+      newEntryModal: '',
+      history: [],
+      daysInMonth: [],
+      currentYear: new Date().getFullYear(),
+      currentMonth: new Date().getMonth(),
+      modalDate: null,
+      isHovered: [] // Track hovered state
+    };
+  },
+  computed: {
+    daysInMonthFiltered() {
+      return this.daysInMonth.filter(day => day.date !== null);
+    }
+  },
+  methods: {
+    addEntryModal() {
+      if (this.newEntryModal.trim() === '') return;
+
+      const entry = {
+        date: this.modalDate.toLocaleDateString(),
+        name: this.newEntryModal.trim()
+      };
+
+      this.history.push(entry);
+      this.newEntryModal = '';
+      this.saveHistory();
+      this.updateDaysInMonth();
+      this.closeModal();
+    },
+    saveHistory() {
+      localStorage.setItem('eatingHistory', JSON.stringify(this.history));
+    },
+    loadHistory() {
+      const savedHistory = localStorage.getItem('eatingHistory');
+      if (savedHistory) {
+        this.history = JSON.parse(savedHistory);
+      }
+      this.updateDaysInMonth();
+    },
+    updateDaysInMonth() {
+      const year = this.currentYear;
+      const month = this.currentMonth;
+
+      // Calculate the number of days in the month
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      
+      this.daysInMonth = [];
+
+      // Calculate the first day of the month
+      const firstDay = new Date(year, month, 1).getDay();
+
+      // Add empty days before the first day of the month
+      if (firstDay !== 1) {
+        for (let i = 1; i < firstDay; i++) {
+          this.daysInMonth.push({ date: null, entries: [] });
+        }
+      }
+
+      // Add days with entries
+      for (let i = 0; i < daysInMonth; i++) {
+        const date = new Date(year, month, i + 1);
+        const entries = this.history.filter(entry => {
+          const entryDate = new Date(entry.date);
+          return (
+            entryDate.getFullYear() === year &&
+            entryDate.getMonth() === month &&
+            entryDate.getDate() === date.getDate()
+          );
+        });
+        this.daysInMonth.push({ date, entries });
+      }
+
+      // Initialize the hovered state tracker
+      this.isHovered = Array.from({ length: this.daysInMonth.length }, () => []);
+    },
+    getDayOfWeek(date) {
+      if (!date) return '';
+      const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+      return daysOfWeek[date.getDay()];
+    },
+    deleteEntry(date, entryIndex) {
+      const dateString = date.toLocaleDateString();
+      this.history = this.history.filter((entry, index) => {
+        if (entry.date === dateString && index === entryIndex) {
+          return false;
+        }
+        return true;
+      });
+      this.saveHistory();
+      this.updateDaysInMonth();
+    },
+    prevMonth() {
+      if (this.currentMonth === 0) {
+        this.currentMonth = 11;
+        this.currentYear -= 1;
+      } else {
+        this.currentMonth -= 1;
+      }
+      this.updateDaysInMonth();
+    },
+    nextMonth() {
+      if (this.currentMonth === 11) {
+        this.currentMonth = 0;
+        this.currentYear += 1;
+      } else {
+        this.currentMonth += 1;
+      }
+      this.updateDaysInMonth();
+    },
+    showEntryModal(date) {
+      this.modalDate = date;
+      this.newEntryModal = '';
+    },
+    closeModal() {
+      this.modalDate = null;
+      this.newEntryModal = '';
+    }
+  },
+  mounted() {
+    this.loadHistory();
+  }
 };
 </script>
 
 <style scoped>
-/* your component styles here */
+.eating-history {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h2 {
+  font-size: 1.5em;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.day {
+  border: 1px solid #ddd;
+  padding: 10px;
+  min-height: 100px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+.day:hover {
+  background-color: #f0f0f0;
+}
+
+.date {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.entries {
+  margin-top: 10px;
+}
+
+.entry {
+  background-color: #f2f2f2;
+  margin-bottom: 5px;
+  padding: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.delete-button {
+  background-color: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  transition: color 0.3s;
+  opacity: 0;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+
+.delete-button:hover {
+  color: darkred;
+}
+
+.entry:hover .delete-button {
+  opacity: 1;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 1px solid #ddd;
+  z-index: 1000;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal h3 {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.modal input {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+}
+
+.modal button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.modal button:hover {
+  background-color: #0056b3;
+}
 </style>

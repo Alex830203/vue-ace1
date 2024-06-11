@@ -4,7 +4,7 @@
       <div class="page">
         <router-link to="/" class="router">首頁</router-link>
         <div v-if="isLoggedIn">
-          <router-link
+          <!-- <router-link
             :to="{
               path: '/suspiciousplayer',
               query: { token: isLoggedIn ? userToken : null },
@@ -17,14 +17,6 @@
             class="router"
             >對投查詢</router-link
           >
-          <!-- <router-link
-            :to="{
-              path: '/currency_conversion',
-              query: { token: isLoggedIn ? userToken : null },
-            }"
-            class="router"
-            >貨幣換算</router-link
-          > -->
           <router-link
             :to="{ path: '/playroad', query: { token: isLoggedIn ? userToken : null } }"
             class="router"
@@ -34,11 +26,19 @@
             :to="{ path: '/api', query: { token: isLoggedIn ? userToken : null } }"
             class="router"
             >API</router-link
-          >
+          > -->
           <router-link
             :to="{ path: '/tgbot', query: { token: isLoggedIn ? userToken : null } }"
             class="router"
             >口袋名單</router-link
+          >
+          <router-link
+            :to="{
+              path: '/currency_conversion',
+              query: { token: isLoggedIn ? userToken : null },
+            }"
+            class="router"
+            >美食日曆</router-link
           >
         </div>
       </div>

@@ -4,7 +4,7 @@
     <input type="text" v-model="range" placeholder="Enter range (e.g., 'Sheet1!A1:E10')" />
     <button @click="fetchData">查詢</button>
     <button v-if="data.length" @click="pickRandomRow">隨機</button>
-    <button v-if="data.length" @click="pickRandom500Times">隨機500次</button>
+    <button v-if="data.length" @click="pickRandom100Times">隨機100次</button>
     <button v-if="data.length" @click="selectAll">全選</button>
     <button v-if="data.length" @click="selectInverse">全反選</button>
 
@@ -109,9 +109,9 @@ export default {
         }
       }
     },
-    async pickRandom500Times() {
-      for (let i = 0; i < 500; i++) {
-        await new Promise(resolve => setTimeout(resolve, 10)); // Wait for 10 milliseconds
+    async pickRandom100Times() {
+      for (let i = 0; i < 100; i++) {
+        await new Promise(resolve => setTimeout(resolve, 50)); // Wait for 50 milliseconds
         this.pickRandomRow();
       }
     },
@@ -141,6 +141,6 @@ th {
 }
 
 .highlighted {
-  background-color: yellow; /* 高亮顏色可以自行調整 */
+  background-color: rgb(233, 230, 63); /* 高亮顏色可以自行調整 */
 }
 </style>
