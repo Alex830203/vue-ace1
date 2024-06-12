@@ -3,6 +3,7 @@
     <h2>{{ currentYear }} 年 {{ currentMonth + 1 }} 月</h2>
     <button @click="prevMonth">上個月</button>
     <button @click="nextMonth">下個月</button>
+    <button @click="refreshData">刷新</button>
 
     <div class="calendar">
       <div
@@ -13,6 +14,9 @@
       >
         <div class="date">
           {{ day.date ? day.date.getDate() + ' (' + getDayOfWeek(day.date) + ')' : '' }}
+          <button class="clear-button" @click.stop="clearEntries(day.date)">
+            X
+          </button>
         </div>
         <div class="entries">
           <div v-for="(entry, entryIndex) in day.entries" :key="entryIndex" class="entry">
@@ -22,7 +26,7 @@
               @click.stop="deleteEntry(day.date, entryIndex)"
               v-show="isHovered[index][entryIndex]"
             >
-              X
+              刪除
             </button>
           </div>
         </div>
@@ -32,13 +36,15 @@
     <div v-if="modalDate !== null" class="modal">
       <h3>{{ modalDate.toLocaleDateString() }}</h3>
       <input v-model="newEntryModal" placeholder="新增店家名稱" />
-      <button @click="addEntryModal">新增</button>
+      <button @click="postEntryModal">新增</button>
       <button @click="closeModal">取消</button>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -48,7 +54,7 @@ export default {
       currentYear: new Date().getFullYear(),
       currentMonth: new Date().getMonth(),
       modalDate: null,
-      isHovered: [] // Track hovered state
+      isHovered: [] // 追蹤滑鼠懸停狀態
     };
   },
   computed: {
@@ -57,7 +63,7 @@ export default {
     }
   },
   methods: {
-    addEntryModal() {
+    async postEntryModal() {
       if (this.newEntryModal.trim() === '') return;
 
       const entry = {
@@ -65,11 +71,61 @@ export default {
         name: this.newEntryModal.trim()
       };
 
-      this.history.push(entry);
-      this.newEntryModal = '';
-      this.saveHistory();
-      this.updateDaysInMonth();
-      this.closeModal();
+      try {
+        const response = await axios.post('http://35.221.234.228:3000/api/addfood', entry, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.status === 200) {
+          throw new Error('新增項目失敗');
+        }
+
+        this.history.push(entry);
+        this.newEntryModal = '';
+        this.saveHistory();
+        this.updateDaysInMonth();
+        this.closeModal();
+      } catch (error) {
+        console.error('錯誤發生:', error);
+      }
+    },
+    async refreshData() {
+      try {
+        const response = await axios.get('http://35.221.234.228:3000/api/foodlist');
+        this.history = response.data.map(item => ({
+          date: item.date || new Date(item.createdtime).toLocaleDateString(),
+          name: item.name
+        }));
+        this.updateDaysInMonth();
+      } catch (error) {
+        console.error('獲取數據時發生錯誤:', error);
+      }
+    },
+    async clearEntries(date) {
+      const confirmClear = confirm(`確定要清空 ${date.toLocaleDateString()} 的所有項目嗎？`);
+      if (!confirmClear) return;
+
+      const dateString = date.toLocaleDateString();
+
+      try {
+        const response = await axios.post('http://35.221.234.228:3000/api/deletefood', { date: dateString }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.status === 200) {
+          this.history = this.history.filter(entry => entry.date !== dateString);
+          this.updateDaysInMonth();
+          this.saveHistory();
+        } else {
+          throw new Error('清空項目失敗');
+        }
+      } catch (error) {
+        console.error('清空項目時發生錯誤:', error);
+      }
     },
     saveHistory() {
       localStorage.setItem('eatingHistory', JSON.stringify(this.history));
@@ -85,22 +141,22 @@ export default {
       const year = this.currentYear;
       const month = this.currentMonth;
 
-      // Calculate the number of days in the month
+      // 計算本月天數
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       
       this.daysInMonth = [];
 
-      // Calculate the first day of the month
+      // 計算本月第一天是星期幾
       const firstDay = new Date(year, month, 1).getDay();
 
-      // Add empty days before the first day of the month
+      // 在本月第一天之前添加空白天數
       if (firstDay !== 1) {
         for (let i = 1; i < firstDay; i++) {
           this.daysInMonth.push({ date: null, entries: [] });
         }
       }
 
-      // Add days with entries
+      // 添加有項目的日期
       for (let i = 0; i < daysInMonth; i++) {
         const date = new Date(year, month, i + 1);
         const entries = this.history.filter(entry => {
@@ -114,7 +170,7 @@ export default {
         this.daysInMonth.push({ date, entries });
       }
 
-      // Initialize the hovered state tracker
+      // 初始化滑鼠懸停狀態追蹤器
       this.isHovered = Array.from({ length: this.daysInMonth.length }, () => []);
     },
     getDayOfWeek(date) {
