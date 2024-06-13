@@ -72,7 +72,7 @@ export default {
       };
 
       try {
-        const response = await axios.post('http://35.221.234.228:3000/api/addfood', entry, {
+        const response = await axios.post('https://alex777.xyz/api/addfood', entry, {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -93,7 +93,7 @@ export default {
     },
     async refreshData() {
       try {
-        const response = await axios.get('http://35.221.234.228:3000/api/foodlist');
+        const response = await axios.get('https://alex777.xyz/api/foodlist');
         this.history = response.data.map(item => ({
           date: item.date || new Date(item.createdtime).toLocaleDateString(),
           name: item.name
@@ -110,7 +110,7 @@ export default {
       const dateString = date.toLocaleDateString();
 
       try {
-        const response = await axios.post('http://35.221.234.228:3000/api/deletefood', { date: dateString }, {
+        const response = await axios.post('https://alex777.xyz/api/deletefood', { date: dateString }, {
           headers: {
             'Content-Type': 'application/json'
           }
