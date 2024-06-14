@@ -14,21 +14,15 @@
       >
         <div class="date">
           {{ day.date ? day.date.getDate() + ' (' + getDayOfWeek(day.date) + ')' : '' }}
-          <button class="clear-button"             
-            v-if="day.entries.length > 0"
-            @click.stop="clearEntries(day.date)">
-            x
-          </button>
         </div>
         <div class="entries">
           <div v-for="(entry, entryIndex) in day.entries" :key="entryIndex" class="entry">
             <div>{{ entry.name }}</div>
             <button
-              class="delete-button"
-              @click.stop="deleteEntry(day.date, entryIndex)"
-              v-show="isHovered[index][entryIndex]"
+              class="clear-button"
+              @click.stop="deleteEntry(day.date, entry.name)"
             >
-              刪除
+              X
             </button>
           </div>
         </div>
@@ -105,28 +99,33 @@ export default {
         console.error('獲取數據時發生錯誤:', error);
       }
     },
-    async clearEntries(date) {
-      const confirmClear = confirm(`確定要清空 ${date.toLocaleDateString()} 的所有項目嗎？`);
-      if (!confirmClear) return;
+    async deleteEntry(date, name) {
+      const confirmDelete = confirm(`確定要刪除 ${date.toLocaleDateString()} 的 ${name} 嗎？`);
+      if (!confirmDelete) return;
 
-      const dateString = date.toLocaleDateString();
+      const entryToDelete = {
+        date: date.toLocaleDateString(),
+        name: name
+      };
 
       try {
-        const response = await axios.post('https://alex777.xyz/api/deletefood', { date: dateString }, {
+        const response = await axios.post('https://alex777.xyz/api/deletefood', entryToDelete, {
           headers: {
             'Content-Type': 'application/json'
           }
         });
 
         if (response.status === 200) {
-          this.history = this.history.filter(entry => entry.date !== dateString);
+          this.history = this.history.filter(entry => {
+            return !(entry.date === entryToDelete.date && entry.name === entryToDelete.name);
+          });
           this.updateDaysInMonth();
           this.saveHistory();
         } else {
-          throw new Error('清空項目失敗');
+          throw new Error('刪除項目失敗');
         }
       } catch (error) {
-        console.error('清空項目時發生錯誤:', error);
+        console.error('刪除項目時發生錯誤:', error);
       }
     },
     saveHistory() {
@@ -179,17 +178,6 @@ export default {
       if (!date) return '';
       const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
       return daysOfWeek[date.getDay()];
-    },
-    deleteEntry(date, entryIndex) {
-      const dateString = date.toLocaleDateString();
-      this.history = this.history.filter((entry, index) => {
-        if (entry.date === dateString && index === entryIndex) {
-          return false;
-        }
-        return true;
-      });
-      this.saveHistory();
-      this.updateDaysInMonth();
     },
     prevMonth() {
       if (this.currentMonth === 0) {
@@ -248,13 +236,13 @@ button {
 }
 
 .clear-button {
-  background-color: #82abd6;
-  color: rgb(24, 22, 22);
+  background-color: #d9534f;
+  color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 2px 6px;
   cursor: pointer;
+  border-radius: 50%; /* 添加圓角 */
 }
-
 
 button:hover {
   background-color: #6d9ed3;
@@ -296,7 +284,7 @@ button:hover {
   justify-content: space-between;
   align-items: center;
   position: relative;
-  border-radius: 10px;
+  border-radius: 10px; /* 添加圓角 */
 }
 
 .delete-button {
@@ -331,6 +319,7 @@ button:hover {
   max-width: 400px;
   width: 100%;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; /* 添加圓角 */
 }
 
 .modal h3 {
