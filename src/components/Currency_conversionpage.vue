@@ -14,8 +14,10 @@
       >
         <div class="date">
           {{ day.date ? day.date.getDate() + ' (' + getDayOfWeek(day.date) + ')' : '' }}
-          <button class="clear-button" @click.stop="clearEntries(day.date)">
-            X
+          <button class="clear-button"             
+            v-if="day.entries.length > 0"
+            @click.stop="clearEntries(day.date)">
+            x
           </button>
         </div>
         <div class="entries">
@@ -237,7 +239,7 @@ h2 {
 }
 
 button {
-  background-color: #007bff;
+  background-color: #82abd6;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -245,8 +247,17 @@ button {
   margin: 0 5px;
 }
 
+.clear-button {
+  background-color: #82abd6;
+  color: rgb(24, 22, 22);
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+
 button:hover {
-  background-color: #0056b3;
+  background-color: #6d9ed3;
 }
 
 .calendar {
@@ -278,13 +289,14 @@ button:hover {
 }
 
 .entry {
-  background-color: #f2f2f2;
+  background-color: #82abd62a;
   margin-bottom: 5px;
   padding: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
+  border-radius: 10px;
 }
 
 .delete-button {
@@ -334,7 +346,7 @@ button:hover {
 }
 
 .modal button {
-  background-color: #007bff;
+  background-color: #82abd6;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -343,6 +355,6 @@ button:hover {
 }
 
 .modal button:hover {
-  background-color: #0056b3;
+  background-color: #6a9cd1;
 }
 </style>
