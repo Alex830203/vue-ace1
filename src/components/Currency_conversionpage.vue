@@ -16,7 +16,7 @@
           {{ day.date ? day.date.getDate() + ' (' + getDayOfWeek(day.date) + ')' : '' }}
         </div>
         <div class="entries">
-          <div v-for="(entry, entryIndex) in day.entries" :key="entryIndex" class="entry">
+          <div v-for="(entry, entryIndex) in day.entries" :key="entryIndex" :class="getEntryClass(entry)">
             <div>{{ entry.name }}</div>
             <button
               class="clear-button"
@@ -31,6 +31,17 @@
 
     <div v-if="modalDate !== null" class="modal">
       <h3>{{ modalDate.toLocaleDateString() }}</h3>
+      <div class="radio-group">
+        <label>
+          ❤️<input type="radio" name="pet" value="together" v-model="selectedOption"/>
+        </label>
+        <label>
+          🐱<input type="radio" name="pet" value="cat" v-model="selectedOption"/>
+        </label>
+        <label>
+          🐶<input type="radio" name="pet" value="dog" v-model="selectedOption"/>
+        </label>
+      </div> 
       <input v-model="newEntryModal" placeholder="新增店家名稱" />
       <button @click="postEntryModal">新增</button>
       <button @click="closeModal">取消</button>
@@ -50,6 +61,7 @@ export default {
       currentYear: new Date().getFullYear(),
       currentMonth: new Date().getMonth(),
       modalDate: null,
+      selectedOption: 'together',
       isHovered: [] // 追蹤滑鼠懸停狀態
     };
   },
@@ -64,7 +76,8 @@ export default {
 
       const entry = {
         date: this.modalDate.toLocaleDateString(),
-        name: this.newEntryModal.trim()
+        name: this.newEntryModal.trim(),
+        type: this.selectedOption
       };
 
       try {
@@ -74,12 +87,13 @@ export default {
           }
         });
 
-        if (!response.status === 200) {
+        if (response.status !== 200) {
           throw new Error('新增項目失敗');
         }
 
         this.history.push(entry);
         this.newEntryModal = '';
+        this.selectedOption = 'together';
         this.saveHistory();
         this.updateDaysInMonth();
         this.closeModal();
@@ -92,7 +106,8 @@ export default {
         const response = await axios.get('https://alex777.xyz/api/foodlist');
         this.history = response.data.map(item => ({
           date: item.date || new Date(item.createdtime).toLocaleDateString(),
-          name: item.name
+          name: item.name,
+          type: item.type
         }));
         this.updateDaysInMonth();
       } catch (error) {
@@ -204,6 +219,15 @@ export default {
     closeModal() {
       this.modalDate = null;
       this.newEntryModal = '';
+    },
+    getEntryClass(entry) {
+      if (entry.type === 'dog') {
+        return 'entry-dog';
+      } else if (entry.type === 'cat') {
+        return 'entry-cat';
+      } else {
+        return 'entry-together';
+      }
     }
   },
   mounted() {
@@ -276,8 +300,30 @@ button:hover {
   margin-top: 10px;
 }
 
-.entry {
-  background-color: #82abd62a;
+.entry-dog {
+  background-color: #a6b2dade;
+  margin-bottom: 5px;
+  padding: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  border-radius: 10px; /* 添加圓角 */
+}
+
+.entry-cat {
+  background-color: #d8abc4d5;
+  margin-bottom: 5px;
+  padding: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  border-radius: 10px; /* 添加圓角 */
+}
+
+.entry-together {
+  background-color: #e6ffe6d0;
   margin-bottom: 5px;
   padding: 5px;
   display: flex;
@@ -345,5 +391,17 @@ button:hover {
 
 .modal button:hover {
   background-color: #6a9cd1;
+}
+
+.radio-group {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px; /* 增加底部間距 */
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 </style>
