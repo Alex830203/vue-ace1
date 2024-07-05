@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/valid-template-root -->
 <template>
   <div style="height: 80px; margin-top: 4%">
     <input type="text" v-model="range" placeholder="Enter range (e.g., 'Sheet1!A1:E10')" />
@@ -28,7 +27,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, rowIndex) in data" :key="rowIndex" :class="{ 'highlighted': rowIndex === randomRowIndex && rowSelections[rowIndex] }">
+        <tr v-for="(row, rowIndex) in data" :key="rowIndex" :class="{ 'highlighted': rowIndex === randomRowIndex }">
           <td>
             <input type="checkbox" v-model="rowSelections[rowIndex]" />
           </td>
@@ -119,7 +118,7 @@ export default {
       this.rowSelections = new Array(this.data.length).fill(true);
     },
     selectInverse() {
-      this.rowSelections = new Array(this.data.length).fill(false);
+      this.rowSelections = this.rowSelections.map(selection => !selection);
     }
   }
 };
