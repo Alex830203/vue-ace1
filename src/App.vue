@@ -44,8 +44,8 @@
       </div>
 
       <div v-if="!isLoggedIn" class="login">
-        <input v-model="userCode" type="text" placeholder="帳號" class="input" />
-        <input v-model="userPwd" type="password" placeholder="密碼" class="input" />
+        <input v-model="username" type="text" placeholder="帳號" class="input" />
+        <input v-model="password" type="password" placeholder="密碼" class="input" />
         <button @click="login" class="button">登入</button>
       </div>
       <div v-if="isLoggedIn" class="info">
@@ -65,8 +65,8 @@ import axios from "axios";
 export default {
   data() {
     return {
-      userCode: "admin", // 使用者帳號綁定的資料屬性
-      userPwd: "111111", // 使用者密碼綁定的資料屬性
+      username: "", // 使用者帳號綁定的資料屬性
+      password: "", // 使用者密碼綁定的資料屬性
       isLoggedIn: false, //預設登入狀態
       userToken: "",
       currentTime: this.getCurrentTime(),
@@ -92,10 +92,10 @@ export default {
     async login() {
       try {
         const response = await axios.post(
-          "https://my-json-server.typicode.com/Alex830203/Data/posts",
+          "https://alex777.xyz/api/adminlogin",
           {
-            userCode: this.userCode,
-            userPwd: this.userPwd,
+            username: this.username,
+            password: this.password,
           },
           {
             headers: {
@@ -106,10 +106,10 @@ export default {
         );
 
         // 處理 API 回應的邏輯，可能是導航到其他頁面或顯示成功訊息等
-        console.log("登入成功！", response.data.token);
+        console.log("登入成功！", response.data.accessToken);
 
-        // 將 token 儲存到 userToken 中
-        this.userToken = response.data.token;
+        // 將 accessToken 儲存到 userToken 中
+        this.userToken = response.data.accessToken;
 
         // 設定 isLoggedIn 為 true
         this.isLoggedIn = true;
