@@ -245,6 +245,7 @@ export default {
 }
 
 h2 {
+  margin-top: 6%;
   font-size: 1.5em;
   text-align: center;
   margin-bottom: 20px;

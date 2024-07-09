@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 80px; margin-top: 4%">
+  <div style="height: 80px; margin-top: 6%">
     <input type="text" v-model="range" placeholder="Enter range (e.g., 'Sheet1!A1:E10')" />
     <button @click="fetchData">查詢</button>
     <button v-if="data.length" @click="pickRandomRow">隨機</button>
@@ -137,6 +137,21 @@ th, td {
 
 th {
   background-color: #f2f2f2;
+}
+
+button {
+  background-color: #82abd6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+input {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
 }
 
 .highlighted {
