@@ -1,13 +1,13 @@
 <template>
     <div>
-      <h1>每日圖像和匯率</h1>
+      <h1>每日新聞和匯率</h1>
   
-      <!-- 显示每日生成的图像 -->
+      <!-- 显示每日生成的新聞 -->
       <div v-if="news.length > 0">
-        <h2>今日圖像</h2>
-        <!-- <div v-for="(article, index) in news" :key="index" class="image-container">
-          <img v-if="article.image" :src="article.image" alt="每日圖像" style="max-width: 100%; height: auto;">
-        </div> -->
+        <h2>今日新聞</h2>
+        <div v-for="(article, index) in news" :key="index" class="image-container">
+          <img v-if="article.image" :src="article.image" alt="每日新聞" style="max-width: 100%; height: auto;">
+        </div>
       </div>
   
       <!-- 显示美金和日圆的匯率 -->
@@ -41,7 +41,7 @@
       const fetchData = async () => {
         try {
           // 獲取圖像路徑
-          const newsResponse = await axios.get('https://gnews.io/api/v4/top-headlines?category=general&lang=zh&country=tw&max=10&apikey=a2952b90f0439b39323935f65eeb00e9');
+          const newsResponse = await axios.get('https://gnews.io/api/v4/top-headlines?category=general&lang=zh&country=tw&max=100&apikey=a2952b90f0439b39323935f65eeb00e9');
           news.value = newsResponse.data.articles; // 将所有文章存入 news
   
           // 打印每个图像链接到控制台
