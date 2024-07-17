@@ -6,7 +6,7 @@ import Crossbetpage from '../components/Crossbetpage.vue';
 import Suspiciousplayerpage from '../components/Suspiciousplayerpage.vue';
 import TGBOTpage from '../components/TGBOTpage.vue';
 import Playroadpage from '../components/Playroadpage.vue';
-
+import Newspage from '../components/Newspage.vue';
 
 const routes = [
   {
@@ -54,6 +54,13 @@ const routes = [
     path: '/suspiciousplayer',
     name: 'suspiciousplayer',
     component: Suspiciousplayerpage,
+    props: (route) => ({ token: route.query.token }),
+    meta: { requiresAuth: true } // 添加 requiresAuth 元信息
+  },
+  {
+    path: '/news',
+    name: 'news',
+    component: Newspage,
     props: (route) => ({ token: route.query.token }),
     meta: { requiresAuth: true } // 添加 requiresAuth 元信息
   },

@@ -40,6 +40,14 @@
             class="router"
             >美食日曆</router-link
           >
+          <router-link
+            :to="{
+              path: '/news',
+              query: { token: isLoggedIn ? userToken : null },
+            }"
+            class="router"
+            >新聞</router-link
+          >
         </div>
       </div>
 

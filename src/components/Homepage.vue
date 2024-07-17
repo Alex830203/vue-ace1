@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: "AboutPage",
+  name: "HomePage",
   data() {
     return {
       images: [
