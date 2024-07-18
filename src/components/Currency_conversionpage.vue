@@ -13,16 +13,15 @@
         @click="showEntryModal(day.date)"
       >
         <div class="date">
-          {{ day.date ? day.date.getDate() + " (" + getDayOfWeek(day.date) + ")" : "" }}
+          {{ day.date ? day.date.getDate() + ' (' + getDayOfWeek(day.date) + ')' : '' }}
         </div>
         <div class="entries">
-          <div
-            v-for="(entry, entryIndex) in day.entries"
-            :key="entryIndex"
-            :class="getEntryClass(entry)"
-          >
+          <div v-for="(entry, entryIndex) in day.entries" :key="entryIndex" :class="getEntryClass(entry)">
             <div>{{ entry.name }}</div>
-            <button class="clear-button" @click.stop="deleteEntry(day.date, entry.name)">
+            <button
+              class="clear-button"
+              @click.stop="deleteEntry(day.date, entry.name)"
+            >
               X
             </button>
           </div>
@@ -34,15 +33,15 @@
       <h3>{{ modalDate.toLocaleDateString() }}</h3>
       <div class="radio-group">
         <label>
-          ❤️<input type="radio" name="pet" value="together" v-model="selectedOption" />
+          ❤️<input type="radio" name="pet" value="together" v-model="selectedOption"/>
         </label>
         <label>
-          🐱<input type="radio" name="pet" value="cat" v-model="selectedOption" />
+          🐱<input type="radio" name="pet" value="cat" v-model="selectedOption"/>
         </label>
         <label>
-          🐶<input type="radio" name="pet" value="dog" v-model="selectedOption" />
+          🐶<input type="radio" name="pet" value="dog" v-model="selectedOption"/>
         </label>
-      </div>
+      </div> 
       <input v-model="newEntryModal" placeholder="新增店家名稱" />
       <button @click="postEntryModal">新增</button>
       <button @click="closeModal">取消</button>
@@ -51,112 +50,104 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
   data() {
     return {
-      newEntryModal: "",
+      newEntryModal: '',
       history: [],
       daysInMonth: [],
       currentYear: new Date().getFullYear(),
       currentMonth: new Date().getMonth(),
       modalDate: null,
-      selectedOption: "together",
-      isHovered: [], // 追蹤滑鼠懸停狀態
+      selectedOption: 'together',
+      isHovered: [] // 追蹤滑鼠懸停狀態
     };
   },
   computed: {
     daysInMonthFiltered() {
-      return this.daysInMonth.filter((day) => day.date !== null);
-    },
+      return this.daysInMonth.filter(day => day.date !== null);
+    }
   },
   methods: {
     async postEntryModal() {
-      if (this.newEntryModal.trim() === "") return;
+      if (this.newEntryModal.trim() === '') return;
 
       const entry = {
         date: this.modalDate.toLocaleDateString(),
         name: this.newEntryModal.trim(),
-        type: this.selectedOption,
+        type: this.selectedOption
       };
 
       try {
-        const response = await axios.post("https://alex777.xyz/api/addfood", entry, {
+        const response = await axios.post('https://alex777.xyz/api/addfood', entry, {
           headers: {
-            "Content-Type": "application/json",
-          },
+            'Content-Type': 'application/json'
+          }
         });
 
         if (response.status !== 200) {
-          throw new Error("新增項目失敗");
+          throw new Error('新增項目失敗');
         }
 
         this.history.push(entry);
-        this.newEntryModal = "";
-        this.selectedOption = "together";
+        this.newEntryModal = '';
+        this.selectedOption = 'together';
         this.saveHistory();
         this.updateDaysInMonth();
         this.closeModal();
       } catch (error) {
-        console.error("錯誤發生:", error);
+        console.error('錯誤發生:', error);
       }
     },
     async refreshData() {
       try {
-        const response = await axios.get("https://alex777.xyz/api/foodlist");
-        this.history = response.data.map((item) => ({
+        const response = await axios.get('https://alex777.xyz/api/foodlist');
+        this.history = response.data.map(item => ({
           date: item.date || new Date(item.createdtime).toLocaleDateString(),
           name: item.name,
-          type: item.type,
+          type: item.type
         }));
         this.updateDaysInMonth();
       } catch (error) {
-        console.error("獲取數據時發生錯誤:", error);
+        console.error('獲取數據時發生錯誤:', error);
       }
     },
     async deleteEntry(date, name) {
-      const confirmDelete = confirm(
-        `確定要刪除 ${date.toLocaleDateString()} 的 ${name} 嗎？`
-      );
+      const confirmDelete = confirm(`確定要刪除 ${date.toLocaleDateString()} 的 ${name} 嗎？`);
       if (!confirmDelete) return;
 
       const entryToDelete = {
         date: date.toLocaleDateString(),
-        name: name,
+        name: name
       };
 
       try {
-        const response = await axios.post(
-          "https://alex777.xyz/api/deletefood",
-          entryToDelete,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
+        const response = await axios.post('https://alex777.xyz/api/deletefood', entryToDelete, {
+          headers: {
+            'Content-Type': 'application/json'
           }
-        );
+        });
 
         if (response.status === 200) {
-          this.history = this.history.filter((entry) => {
-            return !(
-              entry.date === entryToDelete.date && entry.name === entryToDelete.name
-            );
+          this.history = this.history.filter(entry => {
+            return !(entry.date === entryToDelete.date && entry.name === entryToDelete.name);
           });
           this.updateDaysInMonth();
           this.saveHistory();
         } else {
-          throw new Error("刪除項目失敗");
+          throw new Error('刪除項目失敗');
         }
       } catch (error) {
-        console.error("刪除項目時發生錯誤:", error);
+        console.error('刪除項目時發生錯誤:', error);
       }
     },
     saveHistory() {
-      localStorage.setItem("eatingHistory", JSON.stringify(this.history));
+      localStorage.setItem('eatingHistory', JSON.stringify(this.history));
     },
     loadHistory() {
-      const savedHistory = localStorage.getItem("eatingHistory");
+      const savedHistory = localStorage.getItem('eatingHistory');
       if (savedHistory) {
         this.history = JSON.parse(savedHistory);
       }
@@ -168,7 +159,7 @@ export default {
 
       // 計算本月天數
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-
+      
       this.daysInMonth = [];
 
       // 計算本月第一天是星期幾
@@ -184,7 +175,7 @@ export default {
       // 添加有項目的日期
       for (let i = 0; i < daysInMonth; i++) {
         const date = new Date(year, month, i + 1);
-        const entries = this.history.filter((entry) => {
+        const entries = this.history.filter(entry => {
           const entryDate = new Date(entry.date);
           return (
             entryDate.getFullYear() === year &&
@@ -199,8 +190,8 @@ export default {
       this.isHovered = Array.from({ length: this.daysInMonth.length }, () => []);
     },
     getDayOfWeek(date) {
-      if (!date) return "";
-      const daysOfWeek = ["日", "一", "二", "三", "四", "五", "六"];
+      if (!date) return '';
+      const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
       return daysOfWeek[date.getDay()];
     },
     prevMonth() {
@@ -223,25 +214,25 @@ export default {
     },
     showEntryModal(date) {
       this.modalDate = date;
-      this.newEntryModal = "";
+      this.newEntryModal = '';
     },
     closeModal() {
       this.modalDate = null;
-      this.newEntryModal = "";
+      this.newEntryModal = '';
     },
     getEntryClass(entry) {
-      if (entry.type === "dog") {
-        return "entry-dog";
-      } else if (entry.type === "cat") {
-        return "entry-cat";
+      if (entry.type === 'dog') {
+        return 'entry-dog';
+      } else if (entry.type === 'cat') {
+        return 'entry-cat';
       } else {
-        return "entry-together";
+        return 'entry-together';
       }
-    },
+    }
   },
   mounted() {
     this.loadHistory();
-  },
+  }
 };
 </script>
 

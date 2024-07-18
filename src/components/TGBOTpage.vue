@@ -1,17 +1,13 @@
 <template>
   <div style="height: 80px; margin-top: 6%">
-    <input
-      type="text"
-      v-model="range"
-      placeholder="Enter range (e.g., 'Sheet1!A1:E10')"
-    />
+    <input type="text" v-model="range" placeholder="Enter range (e.g., 'Sheet1!A1:E10')" />
     <button @click="fetchData">查詢</button>
     <button v-if="data.length" @click="pickRandomRow">隨機</button>
     <button v-if="data.length" @click="pickRandom100Times">隨機100次</button>
     <button v-if="data.length" @click="selectAll">全選</button>
     <button v-if="data.length" @click="selectInverse">全反選</button>
 
-    <div v-if="randomRowIndex !== -1 && selectedRows.length > 0" style="margin-top: 10px">
+    <div v-if="randomRowIndex !== -1 && selectedRows.length > 0" style="margin-top: 10px;">
       <h3>本次選中的店家:</h3>
       <ul>
         <li v-for="(row, index) in selectedRows" :key="index">
@@ -31,18 +27,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="(row, rowIndex) in data"
-          :key="rowIndex"
-          :class="{ highlighted: rowIndex === randomRowIndex }"
-        >
+        <tr v-for="(row, rowIndex) in data" :key="rowIndex" :class="{ 'highlighted': rowIndex === randomRowIndex }">
           <td>
             <input type="checkbox" v-model="rowSelections[rowIndex]" />
           </td>
           <td>{{ row[0] }}</td>
-          <td>
-            <a :href="row[1]">{{ row[1] }}</a>
-          </td>
+          <td><a :href="row[1]">{{ row[1] }}</a></td>
           <td>{{ selectionCounts[rowIndex] }}</td>
           <td>{{ row[2] }}</td>
         </tr>
@@ -52,30 +42,28 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
   data() {
     return {
-      range: "美食區",
+      range: '美食區',
       data: [],
       headers: [],
       randomRowIndex: -1,
       selectionCounts: [], // Array to store selection counts for each row
-      rowSelections: [], // Array to store row selection status
+      rowSelections: [] // Array to store row selection status
     };
   },
   computed: {
     selectedRows() {
-      return this.data.filter(
-        (row, index) => this.randomRowIndex === index && this.rowSelections[index]
-      );
-    },
+      return this.data.filter((row, index) => this.randomRowIndex === index && this.rowSelections[index]);
+    }
   },
   methods: {
     async fetchData() {
-      const apiKey = "AIzaSyAS8_U9ZjmAQOIJegEUeq_miT8DkcKxcyo";
-      const spreadsheetId = "1PfEa9PkmbXigxEYUPYtmQO9iIb2oY0hPQ0YxEo_z7vM";
+      const apiKey = 'AIzaSyAS8_U9ZjmAQOIJegEUeq_miT8DkcKxcyo';
+      const spreadsheetId = '1PfEa9PkmbXigxEYUPYtmQO9iIb2oY0hPQ0YxEo_z7vM';
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${this.range}?key=${apiKey}`;
 
       try {
@@ -96,7 +84,7 @@ export default {
           this.rowSelections = [];
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         this.headers = [];
         this.data = [];
         this.randomRowIndex = -1;
@@ -122,7 +110,7 @@ export default {
     },
     async pickRandom100Times() {
       for (let i = 0; i < 100; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 50)); // Wait for 50 milliseconds
+        await new Promise(resolve => setTimeout(resolve, 50)); // Wait for 50 milliseconds
         this.pickRandomRow();
       }
     },
@@ -130,9 +118,9 @@ export default {
       this.rowSelections = new Array(this.data.length).fill(true);
     },
     selectInverse() {
-      this.rowSelections = this.rowSelections.map((selection) => !selection);
-    },
-  },
+      this.rowSelections = this.rowSelections.map(selection => !selection);
+    }
+  }
 };
 </script>
 
@@ -142,8 +130,7 @@ table {
   border-collapse: collapse;
 }
 
-th,
-td {
+th, td {
   border: 1px solid #ddd;
   padding: 8px;
 }
