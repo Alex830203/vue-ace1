@@ -3,7 +3,10 @@
     <h2>{{ currentYear }} 年 {{ currentMonth + 1 }} 月</h2>
     <button @click="prevMonth">上個月</button>
     <button @click="nextMonth">下個月</button>
-    <button @click="refreshData">刷新</button>
+    <!-- <button @click="refreshData">
+      刷新
+      <span v-if="lastUpdated"> (最近刷新時間: {{ lastUpdated }})</span>
+    </button> -->
 
     <div class="calendar">
       <div
@@ -63,14 +66,10 @@ export default {
       currentMonth: new Date().getMonth(),
       modalDate: null,
       selectedOption: "together",
-      isHovered: [], // 追蹤滑鼠懸停狀態
+      lastUpdated: "",
     };
   },
-  computed: {
-    daysInMonthFiltered() {
-      return this.daysInMonth.filter((day) => day.date !== null);
-    },
-  },
+
   methods: {
     async postEntryModal() {
       if (this.newEntryModal.trim() === "") return;
@@ -111,6 +110,8 @@ export default {
           type: item.type,
         }));
         this.updateDaysInMonth();
+        this.saveHistory();
+        this.lastUpdated = new Date().toLocaleString();
       } catch (error) {
         console.error("獲取數據時發生錯誤:", error);
       }
@@ -194,9 +195,6 @@ export default {
         });
         this.daysInMonth.push({ date, entries });
       }
-
-      // 初始化滑鼠懸停狀態追蹤器
-      this.isHovered = Array.from({ length: this.daysInMonth.length }, () => []);
     },
     getDayOfWeek(date) {
       if (!date) return "";
@@ -239,8 +237,9 @@ export default {
       }
     },
   },
-  mounted() {
-    this.loadHistory();
+  async mounted() {
+    await this.refreshData(); // 確保先從伺服器獲取最新數據
+    this.loadHistory(); // 然後再載入本地儲存的數據
   },
 };
 </script>
@@ -341,26 +340,6 @@ button:hover {
   align-items: center;
   position: relative;
   border-radius: 10px; /* 添加圓角 */
-}
-
-.delete-button {
-  background-color: transparent;
-  border: none;
-  color: red;
-  cursor: pointer;
-  transition: color 0.3s;
-  opacity: 0;
-  position: absolute;
-  right: 5px;
-  top: 5px;
-}
-
-.delete-button:hover {
-  color: darkred;
-}
-
-.entry:hover .delete-button {
-  opacity: 1;
 }
 
 .modal {
