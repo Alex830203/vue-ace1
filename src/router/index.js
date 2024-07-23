@@ -7,6 +7,8 @@ import Suspiciousplayerpage from '../components/Suspiciousplayerpage.vue';
 import TGBOTpage from '../components/TGBOTpage.vue';
 import Playroadpage from '../components/Playroadpage.vue';
 import Newspage from '../components/Newspage.vue';
+import Stockpage from '../components/Stockpage.vue';
+
 
 const routes = [
   {
@@ -61,6 +63,13 @@ const routes = [
     path: '/news',
     name: 'news',
     component: Newspage,
+    props: (route) => ({ token: route.query.token }),
+    meta: { requiresAuth: true } // 添加 requiresAuth 元信息
+  },
+  {
+    path: '/stock',
+    name: 'stock',
+    component: Stockpage,
     props: (route) => ({ token: route.query.token }),
     meta: { requiresAuth: true } // 添加 requiresAuth 元信息
   },

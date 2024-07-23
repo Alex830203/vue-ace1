@@ -42,6 +42,14 @@
           >
           <router-link
             :to="{
+              path: '/stock',
+              query: { token: isLoggedIn ? userToken : null },
+            }"
+            class="router"
+            >股票</router-link
+          >
+          <router-link
+            :to="{
               path: '/news',
               query: { token: isLoggedIn ? userToken : null },
             }"

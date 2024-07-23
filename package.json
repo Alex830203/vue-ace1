@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "md5": "^2.3.0",
     "vue": "^3.2.13",
+    "vue-draggable-resizable": "^3.0.0",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
