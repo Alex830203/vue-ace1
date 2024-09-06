@@ -3,10 +3,42 @@
     <h2>{{ currentYear }} 年 {{ currentMonth + 1 }} 月</h2>
     <button @click="prevMonth">上個月</button>
     <button @click="nextMonth">下個月</button>
+    <button @click="toggleStatistics">
+      {{ showStatistics ? "隱藏統計" : "顯示統計" }}
+    </button>
     <!-- <button @click="refreshData">
       刷新
       <span v-if="lastUpdated"> (最近刷新時間: {{ lastUpdated }})</span>
     </button> -->
+
+    <div v-if="showStatistics" class="statistics">
+      <table>
+        <thead>
+          <tr>
+            <th>類型</th>
+            <th>數量</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>❤️</td>
+            <td>{{ statistics[`${currentYear}-${currentMonth + 1}`]?.together || 0 }}</td>
+          </tr>
+          <tr>
+            <td>🐱</td>
+            <td>{{ statistics[`${currentYear}-${currentMonth + 1}`]?.cat || 0 }}</td>
+          </tr>
+          <tr>
+            <td>🐶</td>
+            <td>{{ statistics[`${currentYear}-${currentMonth + 1}`]?.dog || 0 }}</td>
+          </tr>
+          <tr>
+            <td>未知</td>
+            <td>{{ statistics[`${currentYear}-${currentMonth + 1}`]?.unknown || 0 }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="calendar">
       <div
@@ -55,6 +87,7 @@
 
 <script>
 import axios from "axios";
+import { toast } from "vue3-toastify"; // 導入 toast 函數
 
 export default {
   data() {
@@ -67,6 +100,8 @@ export default {
       modalDate: null,
       selectedOption: "together",
       lastUpdated: "",
+      statistics: {},
+      showStatistics: false,
     };
   },
 
@@ -97,18 +132,37 @@ export default {
         this.saveHistory();
         this.updateDaysInMonth();
         this.closeModal();
+
+        // 顯示成功提示
+        toast.success("添加成功👌", {
+          position: "bottom-center",
+          autoClose: 3000,
+        });
       } catch (error) {
         console.error("錯誤發生:", error);
+        toast.error("添加失敗😱", {
+          position: "bottom-center",
+          autoClose: 3000,
+        });
       }
     },
+
     async refreshData() {
       try {
         const response = await axios.get("https://alex777.xyz/api/foodlist");
-        this.history = response.data.map((item) => ({
+        const data = response.data;
+
+        // 先進行資料分組和統計
+        const groupedData = this.groupAndCountByType(data);
+
+        // 更新歷史資料和統計數據
+        this.history = data.map((item) => ({
           date: item.date || new Date(item.createdtime).toLocaleDateString(),
           name: item.name,
-          type: item.type,
+          type: item.type || "未知",
         }));
+
+        this.statistics = groupedData;
         this.updateDaysInMonth();
         this.saveHistory();
         this.lastUpdated = new Date().toLocaleString();
@@ -116,6 +170,7 @@ export default {
         console.error("獲取數據時發生錯誤:", error);
       }
     },
+
     async deleteEntry(date, name) {
       const confirmDelete = confirm(
         `確定要刪除 ${date.toLocaleDateString()} 的 ${name} 嗎？`
@@ -146,13 +201,55 @@ export default {
           });
           this.updateDaysInMonth();
           this.saveHistory();
+
+          // 顯示成功提示
+          toast.success("刪除成功👌", {
+            position: "bottom-center",
+            autoClose: 3000,
+          });
         } else {
           throw new Error("刪除項目失敗");
         }
       } catch (error) {
         console.error("刪除項目時發生錯誤:", error);
+        toast.error("刪除失敗😱", {
+          position: "bottom-center",
+          autoClose: 3000,
+        });
       }
     },
+
+    groupAndCountByType(data) {
+      const grouped = {};
+      data.forEach((item) => {
+        const date = new Date(item.date);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // JavaScript 的月份從 0 開始
+
+        const key = `${year}-${month}`;
+        if (!grouped[key]) {
+          grouped[key] = {
+            together: 0,
+            cat: 0,
+            dog: 0,
+            unknown: 0,
+          };
+        }
+
+        if (item.type === "together") {
+          grouped[key].together += 1;
+        } else if (item.type === "cat") {
+          grouped[key].cat += 1;
+        } else if (item.type === "dog") {
+          grouped[key].dog += 1;
+        } else {
+          grouped[key].unknown += 1;
+        }
+      });
+
+      return grouped;
+    },
+
     saveHistory() {
       localStorage.setItem("eatingHistory", JSON.stringify(this.history));
     },
@@ -235,6 +332,9 @@ export default {
       } else {
         return "entry-together";
       }
+    },
+    toggleStatistics() {
+      this.showStatistics = !this.showStatistics;
     },
   },
   async mounted() {
@@ -392,5 +492,29 @@ button:hover {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.statistics {
+  margin-top: 20px;
+}
+
+.statistics table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.statistics th,
+.statistics td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.statistics th {
+  background-color: #f4f4f4;
+}
+
+.statistics tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 </style>

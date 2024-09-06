@@ -1,6 +1,8 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
+import Toast from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 const userToken = localStorage.getItem('userToken');
 const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -15,5 +17,6 @@ if (userToken) {
   app.config.globalProperties.$userToken = null;
 }
 
+app.use(Toast);
 app.use(router);
 app.mount('#app');
