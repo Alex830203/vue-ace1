@@ -64,8 +64,10 @@
         <input v-model="password" type="password" placeholder="密碼" class="input" />
         <button @click="login" class="button">登入</button>
       </div>
+
       <div v-if="isLoggedIn" class="info">
-        <H2 style="margin-right: 10px; color: #817777">{{ currentTime }}</H2>
+        <!-- <H2 style="margin-right: 10px; color: #817777">{{ currentTime }}</H2> -->
+        <H2 style="margin-right: 10px; color: #ff7575">{{ elapsedTime }}</H2>
         <button @click="logout" class="button">登出</button>
       </div>
     </div>
@@ -83,9 +85,11 @@ export default {
     return {
       username: "", // 使用者帳號綁定的資料屬性
       password: "", // 使用者密碼綁定的資料屬性
-      isLoggedIn: false, //預設登入狀態
+      isLoggedIn: false, // 預設登入狀態
       userToken: "",
-      currentTime: this.getCurrentTime(),
+      currentTime: this.getCurrentTime(), // 當前時間
+      elapsedTime: "", // 正計時
+      startDate: new Date("2022-05-02T08:00:00"), // 起始日期
     };
   },
 
@@ -97,9 +101,10 @@ export default {
     console.log("登入狀態：", this.isLoggedIn);
     console.log("Token：", this.userToken);
 
-    //更新當前時間
+    //更新當前時間與正計時
     setInterval(() => {
       this.currentTime = this.getCurrentTime();
+      this.elapsedTime = this.getElapsedTime();
       this.checkTokenExpiration();
     }, 1000);
   },
@@ -177,12 +182,25 @@ export default {
       // 使用 router 的 push 方法導航回首頁
       this.$router.push({ name: "home" });
     },
+
     getCurrentTime() {
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, "0");
       const minutes = now.getMinutes().toString().padStart(2, "0");
       const seconds = now.getSeconds().toString().padStart(2, "0");
       return `${hours}:${minutes}:${seconds}`;
+    },
+
+    getElapsedTime() {
+      const now = new Date();
+      const diff = now - this.startDate;
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      return `${days} 天 ${hours} 小時 ${minutes} 分鐘 ${seconds} 秒`;
     },
   },
 };
