@@ -67,7 +67,13 @@
 
       <div v-if="isLoggedIn" class="info">
         <!-- <H2 style="margin-right: 10px; color: #817777">{{ currentTime }}</H2> -->
-        <H2 style="margin-right: 10px; color: #ff7575">{{ elapsedTime }}</H2>
+        <h2
+          class="time-text"
+          @mouseover="showAlternateText"
+          @mouseleave="showCurrentTime"
+        >
+          {{ displayText }}
+        </h2>
         <button @click="logout" class="button">登出</button>
       </div>
     </div>
@@ -90,10 +96,16 @@ export default {
       currentTime: this.getCurrentTime(), // 當前時間
       elapsedTime: "", // 正計時
       startDate: new Date("2022-05-02T08:00:00"), // 起始日期
+      alternateText: "2022/05/02", // 滑鼠移入時顯示的文字
+      displayText: "", // 用來顯示當前的文字
+      isHovering: false, // 用於記錄滑鼠是否在文字上
+      hoverTimeout: null, // 用來記錄延遲的計時器
     };
   },
 
   mounted() {
+    this.displayText = this.elapsedTime; // 初始顯示當前時間
+
     this.isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     this.userToken = localStorage.getItem("userToken");
     this.checkTokenExpiration();
@@ -105,6 +117,9 @@ export default {
     setInterval(() => {
       this.currentTime = this.getCurrentTime();
       this.elapsedTime = this.getElapsedTime();
+      if (!this.isHovering) {
+        this.displayText = this.elapsedTime;
+      }
       this.checkTokenExpiration();
     }, 1000);
   },
@@ -202,6 +217,25 @@ export default {
 
       return `${days} 天 ${hours} 小時 ${minutes} 分鐘 ${seconds} 秒`;
     },
+    showAlternateText() {
+      // 清除之前的計時器，避免延遲出現閃爍問題
+      clearTimeout(this.hoverTimeout);
+
+      // 設定延遲，讓文字變化平滑
+      this.hoverTimeout = setTimeout(() => {
+        this.displayText = this.alternateText;
+        this.isHovering = true;
+      }, 300); // 延遲 300ms
+    },
+
+    showCurrentTime() {
+      // 清除之前的計時器，防止移出時還有未完成的計時器
+      clearTimeout(this.hoverTimeout);
+
+      // 立即恢復顯示正計時
+      this.displayText = this.elapsedTime;
+      this.isHovering = false;
+    },
   },
 };
 </script>
@@ -277,5 +311,17 @@ export default {
 
 .router:hover {
   color: #ffffffc2; /* 滑鼠懸停時改變文字顏色為白色 */
+}
+
+.time-text {
+  margin-right: 10px;
+  color: #4dffff;
+  transition: all 0.6s ease-in-out; /* 過渡效果 */
+  opacity: 1;
+}
+
+.time-text:hover {
+  margin-right: 60px;
+  opacity: 0.7; /* 讓滑鼠懸停時變得半透明，平滑過渡 */
 }
 </style>
