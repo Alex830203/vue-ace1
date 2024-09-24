@@ -77,6 +77,16 @@
         <button @click="logout" class="button">登出</button>
       </div>
     </div>
+
+    <!-- 彈窗 -->
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <h3>最近消息</h3>
+        <p v-html="messageContent" class="modal-message"></p>
+        <button @click="closeModal" class="button">關閉</button>
+      </div>
+    </div>
+
     <div>
       <router-view></router-view>
     </div>
@@ -96,10 +106,12 @@ export default {
       currentTime: this.getCurrentTime(), // 當前時間
       elapsedTime: "", // 正計時
       startDate: new Date("2022-05-02T08:00:00"), // 起始日期
-      alternateText: "2022/05/02", // 滑鼠移入時顯示的文字
+      alternateText: "2022/05/02~現在", // 滑鼠移入時顯示的文字
       displayText: "", // 用來顯示當前的文字
       isHovering: false, // 用於記錄滑鼠是否在文字上
       hoverTimeout: null, // 用來記錄延遲的計時器
+      showModal: false, // 控制彈窗顯示
+      messageContent: "歡迎回來！<br>吃飽了嗎?<br>上班加油!<br>祝您今天一切順心~",
     };
   },
 
@@ -164,10 +176,17 @@ export default {
         this.$router.push({
           query: { token: this.userToken },
         });
+
+        // 顯示彈窗
+        this.showModal = true;
       } catch (error) {
         // 處理登入失敗的情況，例如顯示錯誤訊息
         console.error("登入失敗：", error);
       }
+    },
+
+    closeModal() {
+      this.showModal = false; // 關閉彈窗
     },
 
     // 检查 token 是否过期
@@ -217,6 +236,7 @@ export default {
 
       return `${days} 天 ${hours} 小時 ${minutes} 分鐘 ${seconds} 秒`;
     },
+
     showAlternateText() {
       // 清除之前的計時器，避免延遲出現閃爍問題
       clearTimeout(this.hoverTimeout);
@@ -232,9 +252,11 @@ export default {
       // 清除之前的計時器，防止移出時還有未完成的計時器
       clearTimeout(this.hoverTimeout);
 
-      // 立即恢復顯示正計時
-      this.displayText = this.elapsedTime;
-      this.isHovering = false;
+      // 設定延遲，讓文字變化平滑
+      this.hoverTimeout = setTimeout(() => {
+        this.displayText = this.elapsedTime;
+        this.isHovering = false;
+      }, 300); // 延遲 300ms
     },
   },
 };
@@ -315,13 +337,54 @@ export default {
 
 .time-text {
   margin-right: 10px;
+  font-size: 25px;
   color: #4dffff;
   transition: all 0.6s ease-in-out; /* 過渡效果 */
   opacity: 1;
 }
 
 .time-text:hover {
-  margin-right: 60px;
+  margin-right: 30px;
+  font-size: 30px;
+  color: #ff7575;
   opacity: 0.7; /* 讓滑鼠懸停時變得半透明，平滑過渡 */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-message {
+  font-family: "Arial", sans-serif;
+  font-size: 18px;
+  line-height: 1.6; /* 行高，讓文字間距舒適 */
+  color: #333; /* 文字顏色 */
+  margin: 0;
+}
+
+.modal-message br {
+  margin-bottom: 10px; /* 增加換行之後的距離 */
+}
+
+.modal-message strong {
+  color: #3498db; /* 可以用這個來突出部分文字 */
 }
 </style>
