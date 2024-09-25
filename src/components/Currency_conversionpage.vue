@@ -116,7 +116,7 @@ export default {
       };
 
       try {
-        const response = await axios.post("https://alex777.xyz/api/addfood", entry, {
+        const response = await axios.post("http://13.239.135.6:3000/api/addfood", entry, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -149,7 +149,7 @@ export default {
 
     async refreshData() {
       try {
-        const response = await axios.get("https://alex777.xyz/api/foodlist");
+        const response = await axios.get("http://13.239.135.6:3000/api/foodlist");
         const data = response.data;
 
         // 先進行資料分組和統計
@@ -184,7 +184,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "https://alex777.xyz/api/deletefood",
+          "http://13.239.135.6:3000/api/deletefood",
           entryToDelete,
           {
             headers: {
