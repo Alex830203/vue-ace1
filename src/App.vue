@@ -138,7 +138,7 @@ export default {
     async login() {
       try {
         const response = await axios.post(
-          "http://13.239.135.6:3000/api/adminlogin",
+          "https://alex777.xyz/api/adminlogin",
           {
             username: this.username,
             password: this.password,
