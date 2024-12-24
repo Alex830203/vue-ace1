@@ -74,8 +74,8 @@
     <!-- 彈窗 -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
-        <h3>💎最近消息💎</h3>
-        <img src="/shinee.jpg" alt="小圖" class="modal-image" />
+        <h3>🎄𝕄𝕖𝕣𝕣𝕪 ℂ𝕙𝕣𝕚𝕤𝕥𝕞𝕒𝕤🎄</h3>
+        <img src="/X.jpg" alt="小圖" class="modal-image" />
         <p v-html="messageContent" class="modal-message"></p>
         <button @click="closeModal" class="button">關閉</button>
       </div>
@@ -105,8 +105,7 @@ export default {
       isHovering: false, // 用於記錄滑鼠是否在文字上
       hoverTimeout: null, // 用來記錄延遲的計時器
       showModal: false, // 控制彈窗顯示
-      messageContent:
-        "🌹요정님, 돌아오신 걸 환영해요!<br>吃飽了嗎?<br>上班加油!<br>祝您今天一切順心~",
+      messageContent: "𝙏𝙝𝙞𝙨 𝘾𝙝𝙧𝙞𝙨𝙩𝙢𝙖𝙨, 𝙖𝙡𝙡 𝙄 𝙬𝙖𝙣𝙩 𝙞𝙨 𝙡𝙤𝙫𝙚, 𝙡𝙖𝙪𝙜𝙝𝙩𝙚𝙧, 𝙖𝙣𝙙 𝙖 𝙡𝙞𝙩𝙩𝙡𝙚 𝙨𝙣𝙤𝙬.",
     };
   },
 
@@ -376,7 +375,7 @@ export default {
 
 .modal-image {
   width: 300px; /* 圖片寬度 */
-  height: 180px; /* 圖片高度 */
+  height: 400px; /* 圖片高度 */
   margin-bottom: 15px; /* 圖片與文字之間的間距 */
 }
 
