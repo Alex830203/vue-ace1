@@ -74,8 +74,8 @@
     <!-- 彈窗 -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
-        <h3>🎄𝕄𝕖𝕣𝕣𝕪 ℂ𝕙𝕣𝕚𝕤𝕥𝕞𝕒𝕤🎄</h3>
-        <img src="/X.jpg" alt="小圖" class="modal-image" />
+        <h3>🧨新年快樂🧨</h3>
+        <img src="dog.jpg" alt="小圖" class="modal-image" />
         <p v-html="messageContent" class="modal-message"></p>
         <button @click="closeModal" class="button">關閉</button>
       </div>
@@ -99,13 +99,13 @@ export default {
       userToken: "",
       currentTime: this.getCurrentTime(), // 當前時間
       elapsedTime: "", // 正計時
-      startDate: new Date("2022-05-02T08:00:00"), // 起始日期
-      alternateText: "2022/05/02~現在", // 滑鼠移入時顯示的文字
+      startDate: new Date("2022-05-03T08:00:00"), // 起始日期
+      alternateText: "2022/05/03現在", // 滑鼠移入時顯示的文字
       displayText: "", // 用來顯示當前的文字
       isHovering: false, // 用於記錄滑鼠是否在文字上
       hoverTimeout: null, // 用來記錄延遲的計時器
       showModal: false, // 控制彈窗顯示
-      messageContent: "𝙏𝙝𝙞𝙨 𝘾𝙝𝙧𝙞𝙨𝙩𝙢𝙖𝙨, 𝙖𝙡𝙡 𝙄 𝙬𝙖𝙣𝙩 𝙞𝙨 𝙡𝙤𝙫𝙚, 𝙡𝙖𝙪𝙜𝙝𝙩𝙚𝙧, 𝙖𝙣𝙙 𝙖 𝙡𝙞𝙩𝙩𝙡𝙚 𝙨𝙣𝙤𝙬.",
+      messageContent: "𝙒𝙞𝙨𝙝𝙞𝙣𝙜 𝙮𝙤𝙪 𝙖 𝙮𝙚𝙖𝙧 𝙛𝙞𝙡𝙡𝙚𝙙 𝙬𝙞𝙩𝙝 𝙡𝙪𝙘𝙠, 𝙡𝙤𝙫𝙚, 𝙖𝙣𝙙 𝙚𝙣𝙙𝙡𝙚𝙨𝙨 𝙟𝙤𝙮!",
     };
   },
 
