@@ -7,7 +7,7 @@ module.exports = defineConfig({
     https: false,      // 開啟 HTTPS 支持
     allowedHosts: 'all', // 允許所有主機名，解決 Invalid Host header 問題
     client: {
-      webSocketURL: 'ws://alex777.xyz/ws',
+      webSocketURL: 'ws://alex666.xyz/ws',
     },
   }
 })
